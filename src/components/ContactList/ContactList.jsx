@@ -1,31 +1,27 @@
 import { ContactItem } from 'components/ContactItem/ContactItem';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  getContacts,
-  getContactsFilter,
-} from 'redux/contacts/contactsSelectors';
+import { selectFilteredContacts } from 'redux/contacts/contactsSelectors';
 import { fetchContacts } from 'redux/contacts/contactsThunk';
 import css from './ContactList.module.css';
 
 export const ContactList = () => {
-  const contacts = useSelector(getContacts);
-  const filter = useSelector(getContactsFilter);
+  const filteredContacts = useSelector(selectFilteredContacts);
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchContacts());
   }, [dispatch]);
 
-  const normalizedFilter = filter.toLowerCase();
-  const filteredContacts = contacts.filter(contact =>
-    contact.name.toLowerCase().includes(normalizedFilter)
-  );
   return (
     <ul className={css.list}>
-      {filteredContacts.map(({ id, name, phone }) => (
-        <ContactItem key={id} id={id} name={name} number={phone} />
-      ))}
+      {filteredContacts.length > 0 ? (
+        filteredContacts.map(({ id, name, phone }) => (
+          <ContactItem key={id} id={id} name={name} number={phone} />
+        ))
+      ) : (
+        <div className={css.text}>Contacts not found</div>
+      )}
     </ul>
   );
 };
